@@ -10,10 +10,18 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
+# Remove existing Hysteria2 installation
+systemctl stop hysteria-server.service 2>/dev/null
+systemctl disable hysteria-server.service 2>/dev/null
+bash <(curl -fsSL https://get.hy2.sh/) --remove
+rm -rf /etc/hysteria
+rm -f /etc/systemd/system/hysteria-server.service
+systemctl daemon-reload
+
 # Fixed port
 PORT=8443
 
-# Function to generate random string
+# Generate random string for passwords
 generate_random_string() {
     echo $(openssl rand -base64 16 | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1)
 }
@@ -25,7 +33,6 @@ if [[ -z "$SERVER_IP" ]]; then
     exit 1
 fi
 
-# Generate passwords
 PASSWORD1=$(generate_random_string)
 PASSWORD2=$(generate_random_string)
 
@@ -36,6 +43,9 @@ apt update && apt upgrade -y
 
 # Install Hysteria2
 HYSTERIA_USER=root bash <(curl -fsSL https://get.hy2.sh/)
+
+# Create Hysteria directory
+mkdir -p /etc/hysteria
 
 # Install openssl if not present
 apt install openssl -y
@@ -131,4 +141,3 @@ CLIENT_CONFIG="hysteria2://${PASSWORD2}@${SERVER_IP}:${PORT}?insecure=1&obfs=sal
 echo -e "\n${GREEN}Installation completed successfully!${NC}"
 echo -e "\n${YELLOW}Your Hysteria2 Configuration:${NC}"
 echo -e "${GREEN}$CLIENT_CONFIG${NC}"
-echo -e "\n${YELLOW}You can use this configuration in Hiddify, v2rayN, or other supported clients.${NC}"
