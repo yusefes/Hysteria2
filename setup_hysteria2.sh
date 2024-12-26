@@ -1,21 +1,17 @@
 #!/bin/bash
 
-# Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-# Check if script is run as root
 if [[ $EUID -ne 0 ]]; then
    echo -e "${RED}This script must be run as root${NC}"
    exit 1
 fi
 
-# Function to generate random port between 10000-65535
-generate_random_port() {
-    echo $(shuf -i 10000-65535 -n 1)
-}
+# Fixed port
+PORT=8443
 
 # Function to generate random string
 generate_random_string() {
@@ -29,8 +25,7 @@ if [[ -z "$SERVER_IP" ]]; then
     exit 1
 fi
 
-# Generate random port and passwords
-PORT=$(generate_random_port)
+# Generate passwords
 PASSWORD1=$(generate_random_string)
 PASSWORD2=$(generate_random_string)
 
