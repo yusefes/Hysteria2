@@ -14,4 +14,4 @@ This script automates the installation and configuration of Hysteria2 on a Linux
 2. Run the following command to install and configure Hysteria2:
 
    ```bash
-   wget -O - https://github.com/yourusername/your-repo-name/raw/main/setup_hysteria2.sh | bash
+   wget -O - https://github.com/yourusername/yusefes/raw/main/setup_hysteria2.sh | bash
