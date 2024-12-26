@@ -1,12 +1,14 @@
 #!/bin/bash
 
+export DEBIAN_FRONTEND=noninteractive
+
 # Update packages
 echo "Updating packages..."
 sudo apt update && sudo apt upgrade -y
 
 # Install necessary packages
 echo "Installing necessary packages..."
-sudo apt install -y wget curl openssl
+sudo apt install -y wget curl openssl dialog
 
 # Install Hysteria2
 echo "Installing Hysteria2..."
