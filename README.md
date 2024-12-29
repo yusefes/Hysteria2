@@ -1,56 +1,61 @@
-# Hysteria2 Auto Installer
+# Hysteria 2 Auto Installer
 
-This script automatically installs and configures Hysteria2 on your VPS with randomly generated ports and passwords for enhanced security.
+This script automatically installs and configures Hysteria 2 server with secure defaults and automatic configuration.
 
 ## Features
 
-- Automatic installation of Hysteria2
-- Random port generation
-- Secure password generation
+- One-command installation
 - Automatic IP detection
-- Self-signed certificate generation
-- Systemd service configuration
+- Secure default configuration
+- TLS certificate generation
+- Automatic service configuration
 - Client configuration generation
 
-## Requirements
+## Quick Start
 
-- Ubuntu/Debian based system
-- Root access
-- Clean VPS (recommended)
-
-## Quick Installation
+To install Hysteria 2, run this command on your server:
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/yusefes/Hysteria2/main/setup_hysteria2.sh)
 ```
 
+## Requirements
+
+- Ubuntu/Debian-based system
+- Root access
+- Port 443 available
+
 ## What it does
 
-1. Updates system packages
-2. Installs Hysteria2
-3. Generates necessary certificates
-4. Configures Hysteria2 with secure settings
-5. Sets up and starts systemd service
-6. Provides ready-to-use client configuration
+1. Installs required packages
+2. Installs Hysteria 2
+3. Generates TLS certificates
+4. Configures the server
+5. Sets up the service
+6. Generates client configuration
 
-## Supported Clients
+## Security Features
 
-- Hiddify (Android, iOS, macOS, Windows)
-- v2rayN (Windows)
-- v2rayNG (Android)
-- Streisand (iOS)
+- Automatic password generation
+- TLS encryption
+- Salamander obfuscation
+- Secure default settings
 
-## Security Considerations
+## After Installation
 
-- Random port assignment reduces targeted scanning
-- Unique passwords generated for each installation
-- Self-signed certificates for encrypted connections
-- Automatic service configuration and startup
+The script will display a client configuration URL that can be used in Hysteria 2 clients.
+
+## Troubleshooting
+
+If you encounter any issues:
+1. Check if port 443 is available
+2. Verify your system meets the requirements
+3. Check the logs with: `journalctl -u hysteria-server.service`
 
 ## License
 
 MIT License
 
-## Disclaimer
+## Contributing
 
-This project is for educational purposes only. Users are responsible for ensuring compliance with local laws and regulations regarding VPN usage.
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
