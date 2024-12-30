@@ -48,11 +48,9 @@ install_hysteria() {
 # Generate certificates
 generate_certificates() {
     print_info "Generating certificates..."
-    mkdir -p /etc/hysteria
-    openssl ecparam -name prime256v1 -out /etc/hysteria/params.pem
-    openssl req -x509 -nodes -days 365 -newkey ec:params.pem \
-        -keyout /etc/hysteria/key.pem -out /etc/hysteria/cert.pem \
-        -subj "/CN=hysteria.local"
+    cd /etc/hysteria
+    openssl ecparam -name prime256v1 -genkey -noout -out key.pem
+    openssl req -new -x509 -days 365 -key key.pem -out cert.pem -subj "/CN=hysteria.local"
 }
 
 # Configure Hysteria 2
@@ -65,8 +63,8 @@ configure_hysteria() {
 listen: :443
 
 tls:
-  cert: cert.pem
-  key: key.pem
+  cert: /etc/hysteria/cert.pem
+  key: /etc/hysteria/key.pem
 
 obfs:
   type: salamander
@@ -93,12 +91,15 @@ masquerade:
     url: https://news.ycombinator.com/
     rewriteHost: true
 EOF
+
+    # Save password for later use
+    echo "${PASSWORD}" > /etc/hysteria/password.txt
 }
 
 # Generate client configuration
 generate_client_config() {
     local PUBLIC_IP="$1"
-    local PASSWORD="$2"
+    local PASSWORD=$(cat /etc/hysteria/password.txt)
     
     print_info "Generating client configuration..."
     echo
@@ -106,6 +107,12 @@ generate_client_config() {
     echo "hysteria2://${PASSWORD}@${PUBLIC_IP}:443?insecure=1&obfs=salamander&obfs-password=${PASSWORD}"
     echo "-----------------------------------------------------------------"
     echo
+}
+
+# Create required directories
+prepare_environment() {
+    print_info "Preparing environment..."
+    mkdir -p /etc/hysteria
 }
 
 # Main installation process
@@ -119,24 +126,24 @@ main() {
         exit 1
     fi
     
+    prepare_environment
     install_required_packages
     install_hysteria
     generate_certificates
-    
-    # Generate random password and configure
-    PASSWORD=$(openssl rand -base64 16)
     configure_hysteria "$PUBLIC_IP"
     
     # Start Hysteria 2 service
+    systemctl daemon-reload
     systemctl restart hysteria-server.service
     systemctl enable --now hysteria-server.service
     
     # Check if service is running
     if systemctl is-active --quiet hysteria-server.service; then
         print_info "Hysteria 2 service is running successfully"
-        generate_client_config "$PUBLIC_IP" "$PASSWORD"
+        generate_client_config "$PUBLIC_IP"
     else
-        print_error "Hysteria 2 service failed to start"
+        print_error "Hysteria 2 service failed to start. Checking logs..."
+        journalctl -u hysteria-server.service --no-pager -n 50
         exit 1
     fi
 }
