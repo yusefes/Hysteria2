@@ -1,9 +1,13 @@
 #!/bin/bash
 
-# Automatic Installation Script for Hysteria2 VPN with Port 443
+# Automatic Installation Script for Hysteria2 VPN
 
 # Exit on error
 set -e
+
+# Prompt for port
+read -p "Enter the port for Hysteria2 (default 443): " PORT
+PORT=${PORT:-443}
 
 # Determine the server's public IP
 SERVER_IP=$(curl -s ifconfig.me || curl -s icanhazip.com)
@@ -31,7 +35,7 @@ openssl req -x509 -nodes -days 3650 -newkey ec:/etc/hysteria/params.pem \
 
 # Generate configuration file
 cat > /etc/hysteria/config.yaml <<EOF
-listen: :443
+listen: :$PORT
 
 tls:
   cert: /etc/hysteria/cert.pem
@@ -106,7 +110,7 @@ systemctl enable --now hysteria-server.service
 
 # Display the final configuration
 echo "\nHysteria2 VPN setup is complete. Use the following configuration to connect:"
-CONFIG_URL="hysteria2://StrongAuthPass@$SERVER_IP:443?&insecure=1&obfs=salamander&obfs-password=StrongObfsPass#Hysteria2VPN"
+CONFIG_URL="hysteria2://StrongAuthPass@$SERVER_IP:$PORT?&insecure=1&obfs=salamander&obfs-password=StrongObfsPass#Hysteria2VPN"
 echo "$CONFIG_URL"
 
 # Done
